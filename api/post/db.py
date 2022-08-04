@@ -1,6 +1,7 @@
 all_posts = [
     {
         'id': 1,
+        'category_id': 1,
         'author': 'admin',
         'title': 'My project',
         'short_description': 'Creation of this project',
@@ -8,6 +9,7 @@ all_posts = [
     },
     {
         'id': 2,
+        'category_id': 2,
         'author': 'admin',
         'title': 'Python 3.8.10',
         'short_description': 'How install python 3.8.10',
