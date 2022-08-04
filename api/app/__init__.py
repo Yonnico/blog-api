@@ -157,6 +157,7 @@ def get_category(category_id):
 
 
 @app.route('/blog/api/v1.0/categories', methods=['POST'])
+@auth.login_required
 def create_category():
     if not request.json:
         abort(400)
@@ -176,6 +177,7 @@ def create_category():
 
 
 @app.route('/blog/api/v1.0/categories/<int:category_id>', methods=['PUT'])
+@auth.login_required
 def edit_category(category_id):
     category = find_category_by_id(category_id)
     validate_len(category)
@@ -190,6 +192,7 @@ def edit_category(category_id):
 
 
 @app.route('/blog/api/v1.0/categories/<int:category_id>', methods=['DELETE'])
+@auth.login_required
 def delete_category(category_id):
     category = find_category_by_id(category_id)
     validate_len(category)
