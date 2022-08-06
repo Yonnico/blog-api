@@ -72,21 +72,16 @@ def create_post():
     validate_request('title')
     validate_request('content')
     validate_request('category_id')
-    if 'author' in request.json:
-        if not validate_for_str(request.json['author']):
-            abort(400)
-    if 'title' in request.json:
-        if not validate_for_str(request.json['title']):
-            abort(400)
-    if 'short_description' in request.json:
-        if not validate_for_str(request.json['short_description']):
-            abort(400)
-    if 'content' in request.json:
-        if not validate_for_str(request.json['content']):
-            abort(400)
-    if 'category_id' in request.json:
-        if not validate_for_category(request.json['category_id']):
-            abort(400)
+    if not validate_for_str(request.json['author']):
+        abort(400)
+    if not validate_for_str(request.json['title']):
+        abort(400)
+    if not validate_for_str(request.json['short_description']):
+        abort(400)
+    if not validate_for_str(request.json['content']):
+        abort(400)
+    if not validate_for_category(request.json['category_id']):
+        abort(400)
     posts = get_all_posts()
     id = posts[-1]['id'] + 1
     post = {
@@ -162,9 +157,8 @@ def create_category():
     if not request.json:
         abort(400)
     validate_request('name')
-    if 'name' in request.json:
-        if not validate_for_str(request.json['name']):
-            abort(400)
+    if not validate_for_str(request.json['name']):
+        abort(400)
     categories = get_all_categories()
     id = categories[-1]['id'] + 1
     category = {
