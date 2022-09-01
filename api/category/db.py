@@ -1,10 +1,10 @@
 all_categories = [
     {
         'id': 1,
-        'name': 'Study'
+        'title': 'Study'
     },
     {
         'id': 2,
-        'name': 'IT'
+        'title': 'IT'
     }
 ]
