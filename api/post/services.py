@@ -20,7 +20,7 @@ def make_full_post(post):
     return full_post
 
 
-def get_short_post(posts):
+def get_short_posts(posts):
     return list(map(make_short_post, posts))
 
 
