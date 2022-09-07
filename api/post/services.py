@@ -39,8 +39,11 @@ def get_all_posts():
     return all_posts
 
 
-def remove_post(post):
-    return all_posts.remove(post)
+def remove_post(post_id):
+    post = get_post_by_id(post_id)
+    if post != None:
+        return all_posts.remove(post)
+    return False
 
 
 def validate_and_add_post(author, title, description, content):

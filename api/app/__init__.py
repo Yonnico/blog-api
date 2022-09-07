@@ -99,10 +99,9 @@ def change_post(post_id):
 @app.route('/blog/api/v1.0/posts/<int:post_id>', methods=['DELETE'])
 @auth.login_required
 def delete_post(post_id):
-    post = get_post_by_id(post_id)
-    if not post:
+    result = remove_post(post_id)
+    if result == False:
         abort(404)
-    remove_post(post)
     return jsonify({'result': True})
 
 
@@ -153,8 +152,7 @@ def change_category(category_id):
 @app.route('/blog/api/v1.0/categories/<int:category_id>', methods=['DELETE'])
 @auth.login_required
 def delete_category(category_id):
-    category = get_category_by_id(category_id)
-    if not category:
+    result = remove_category(category_id)
+    if result == False:
         abort(404)
-    remove_category(category)
     return jsonify({'result': True})
