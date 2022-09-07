@@ -1,8 +1,6 @@
-from flask import request
-
 from api.category.db import all_categories
 
-from api.category.validation import validate_title
+from api.category.validation import  validate_title
 
 
 def get_category_by_id(category_id):
@@ -31,19 +29,15 @@ def remove_category(category):
 
 
 def validate_and_add_category(title):
-    if not private_validate_category(title):
+    if not private_validate_category(title, True):
         return None
     return private_add_category(title)
 
 
-def private_validate_category(title):
-    if not request.json:
-        return None
-    if not 'title' in request.json:
-        return None
-    if 'title' in request.json:
+def private_validate_category(title, required):
+    if required or 'title' != None:
         if not validate_title(title):
-            return None
+            return False
     return True
 
 
@@ -61,10 +55,8 @@ def validate_and_change_category(category_id, title):
     category = get_category_by_id(category_id)
     if not category:
         return {'status': 0, 'value': None}
-    if not request.json:
-        return {'status': 1, 'value': "No request"}
-    if title is not None and not validate_title(title):
-        return {'status': 1, 'value': title}
+    if not private_validate_category(title, False):
+        return {'status': 1, 'value': None}
     if title is not None:
         category['title'] = title
     return {'status': 2, 'value': category}

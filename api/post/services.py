@@ -1,13 +1,11 @@
-from flask import request
-
 from api.post.db import all_posts
-
-from api.category.validation import validate_category
 
 from api.category.services import add_category_to_post
 
+from api.category.validation import validate_category
+
 from api.post.validation import validate_author, validate_content, validate_title
-from api.post.validation import validate_s_d, validate_s_d_for_change
+from api.post.validation import validate_description
 
 
 def make_short_post(post):
@@ -18,7 +16,7 @@ def make_short_post(post):
 
 def make_full_post(post):
     full_post = post.copy()
-    full_post.pop('short_description')
+    full_post.pop('description')
     return full_post
 
 
@@ -45,60 +43,58 @@ def remove_post(post):
     return all_posts.remove(post)
 
 
-def validate_and_add_post(category_id, author, title, short_description, content):
-    id = all_posts[-1]['id'] + 1
-    post = post = {
-        'id': id,
-        'category_id': 0,
-        'author': 0,
-        'title': 0,
-        'short_description': 0,
-        'content': 0
-    }
-    if not request.json:
-        return {'status': 1, 'value': "No request"}
-    if not validate_category(category_id):
-        return {'status': 1, 'value': category_id}
-    if not validate_author(author):
-        return {'status': 1, 'value': author}
-    if not validate_title(title):
-        return {'status': 1, 'value': title}
-    if not validate_s_d(short_description):
-        return {'status': 1, 'value': short_description}
-    if not validate_content(content):
-        return {'status': 1, 'value': content}
-    post['category_id'] = category_id
-    post['author'] = author
-    post['title'] = title
-    post['short_description'] = short_description
-    post['content'] = content
-    all_posts.append(post)
-    return {'status': 2, 'value': post}
+def validate_and_add_post(author, title, description, content):
+    if not private_validate_post(author, title, description, content, True):
+        return None
+    return private_add_post(author, title, description, content)
 
-def validate_and_change_post(post_id, category_id, author, title, short_description, content):
+
+def private_validate_post(author, title, description, content, required):
+    if required or author != None:
+        if not validate_author(author):
+            return False
+    if required or title != None:
+        if not validate_title(title):
+            return False
+    if required or description != None:
+        if not validate_description(description):
+            return False
+    if required or content != None:
+        if not validate_content(content):
+            return False
+    return True
+
+
+def private_add_post(author, title, description, content):
+    id = all_posts[-1]['id'] + 1
+    post = {
+        'id': id,
+        'author': author,
+        'title': title,
+        'description': description,
+        'content': content
+    }
+    all_posts.append(post)
+    return post
+
+
+def validate_and_change_post(post_id, category_id, author, title, description, content):
     post = get_post_by_id(post_id)
     if not post:
         return {'status': 0, 'value': None}
-    if not request.json:
-        return {'status': 1, 'value': "No request"}
-    if category_id is not None and not validate_category(category_id):
-        return {'status': 1, 'value': category_id}
-    if author is not None and not validate_author(author):
-        return {'status': 1, 'value': author}
-    if title is not None and not validate_title(title):
-        return {'status': 1, 'value': title}
-    if short_description is not None and not validate_s_d_for_change(short_description):
-        return {'status': 1, 'value': short_description}
-    if content is not None and not validate_content(content):
-        return {'status': 1, 'value': content}
-    if category_id is not None:
+    if not private_validate_post(author, title, description, content, False):
+        return{'status': 1, 'value': None}
+    if category_id != None:
+        if not validate_category(category_id):
+            return{'status': 1, 'value': 'category_id'}
+    if category_id != None:
         post['category_id'] = category_id
-    if author is not None:
+    if author != None:
         post['author'] = author
-    if title is not None:
+    if title != None:
         post['title'] = title
-    if short_description is not None:
-        post['short_description'] = short_description
-    if content is not None:
+    if description != None:
+        post['description'] = description
+    if content != None:
         post['content'] = content
     return {'status': 2, 'value': post}
