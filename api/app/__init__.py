@@ -2,10 +2,9 @@ from flask import Flask, jsonify, abort, make_response, request
 from flask_httpauth import HTTPBasicAuth
 
 
-from api.post.services import get_short_posts, make_full_post, remove_post
+from api.post.services import get_posts_with_category, remove_post
 from api.post.services import get_post_by_id, validate_and_add_post
 from api.post.services import get_all_posts, validate_and_change_post
-from api.post.services import get_posts_with_category
 
 from api.category.services import validate_and_change_category, get_all_categories
 from api.category.services import add_category_to_post, validate_and_add_category
@@ -46,18 +45,18 @@ def get_posts():
     with_category = request.args.get('with-category')
     if with_category or with_category == '':
         posts = get_posts_with_category(posts)
-    return jsonify({'all_posts': get_short_posts(posts)})
+    return jsonify({'all_posts': posts})
 
 
 @app.route('/blog/api/v1.0/posts/<int:post_id>', methods=['GET'])
 def get_post(post_id):
-    post = get_post_by_id(post_id)
+    post = get_post_by_id(post_id, True)
     if not post:
         abort(404)
     with_category = request.args.get('with-category')
     if with_category or with_category == '':
         post = add_category_to_post(post)
-    return jsonify(make_full_post(post))
+    return jsonify(post)
 
 
 @app.route('/blog/api/v1.0/posts', methods=['POST'])

@@ -20,23 +20,24 @@ def make_full_post(post):
     return full_post
 
 
-def get_short_posts(posts):
-    return list(map(make_short_post, posts))
-
-
 def get_posts_with_category(posts):
     return list(map(add_category_to_post, posts))
 
 
-def get_post_by_id(post_id):
+def get_post_by_id(post_id, isFull = False):
     post = list(filter(lambda p: p['id'] == post_id, all_posts))
     if len(post):
-        return post[0]
+        if isFull:
+            return make_full_post(post[0])
+        return make_short_post(post[0])
     return None
 
 
-def get_all_posts():
-    return all_posts
+def get_all_posts(isFull = False):
+    value = all_posts
+    if isFull:
+        return list(map(make_full_post, value))
+    return list(map(make_short_post, value))
 
 
 def remove_post(post_id):
