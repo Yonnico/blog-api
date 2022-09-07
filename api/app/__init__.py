@@ -2,14 +2,13 @@ from flask import Flask, jsonify, abort, make_response, request
 from flask_httpauth import HTTPBasicAuth
 
 
-from api.post.services import get_short_post, make_full_post, remove_post
+from api.post.services import get_posts_with_category, remove_post
 from api.post.services import get_post_by_id, validate_and_add_post
 from api.post.services import get_all_posts, validate_and_change_post
 
-from api.category.services import get_posts_with_category, get_all_categories
+from api.category.services import validate_and_change_category, get_all_categories
 from api.category.services import add_category_to_post, validate_and_add_category
 from api.category.services import get_category_by_id, remove_category
-from api.category.services import validate_and_change_category
 
 
 app = Flask(__name__)
@@ -46,40 +45,41 @@ def get_posts():
     with_category = request.args.get('with-category')
     if with_category or with_category == '':
         posts = get_posts_with_category(posts)
-    return jsonify({'all_posts': get_short_post(posts)})
+    return jsonify({'all_posts': posts})
 
 
 @app.route('/blog/api/v1.0/posts/<int:post_id>', methods=['GET'])
 def get_post(post_id):
-    post = get_post_by_id(post_id)
+    post = get_post_by_id(post_id, True)
     if not post:
         abort(404)
     with_category = request.args.get('with-category')
     if with_category or with_category == '':
         post = add_category_to_post(post)
-    return jsonify(make_full_post(post))
+    return jsonify(post)
 
 
 @app.route('/blog/api/v1.0/posts', methods=['POST'])
 @auth.login_required
 def add_post():
-    response = validate_and_add_post(
-        request.json['category_id'],
-        request.json['author'],
-        request.json['title'],
-        request.json.get('short_description', None),
-        request.json['content']
-    )
-    if response['status'] == 0:
+    if not request.json:
         abort(404)
-    if response['status'] == 1:
+    post = validate_and_add_post(
+        request.json.get('author', None),
+        request.json.get('title', None),
+        request.json.get('description', None),
+        request.json.get('content', None)
+    )
+    if not post:
         abort(400)
-    return jsonify(response['value'])
+    return jsonify(post)
 
 
 @app.route('/blog/api/v1.0/posts/<int:post_id>', methods=['PUT'])
 @auth.login_required
 def change_post(post_id):
+    if not request.json:
+        abort(404)
     response = validate_and_change_post(
         post_id,
         request.json.get('category_id', None),
@@ -98,10 +98,9 @@ def change_post(post_id):
 @app.route('/blog/api/v1.0/posts/<int:post_id>', methods=['DELETE'])
 @auth.login_required
 def delete_post(post_id):
-    post = get_post_by_id(post_id)
-    if not post:
+    result = remove_post(post_id)
+    if result == False:
         abort(404)
-    remove_post(post)
     return jsonify({'result': True})
 
 
@@ -121,9 +120,11 @@ def get_category(category_id):
 
 @app.route('/blog/api/v1.0/categories', methods=['POST'])
 @auth.login_required
-def create_category():
+def add_category():
+    if not request.json:
+        abort(404)
     category = validate_and_add_category(
-        request.json['title']
+        request.json.get('title', None)
     )
     if not category:
         abort(400)
@@ -134,6 +135,8 @@ def create_category():
 @app.route('/blog/api/v1.0/categories/<int:category_id>', methods=['PUT'])
 @auth.login_required
 def change_category(category_id):
+    if not request.json:
+        abort(404)
     response = validate_and_change_category(
         category_id,
         request.json.get('title', None)
@@ -148,8 +151,7 @@ def change_category(category_id):
 @app.route('/blog/api/v1.0/categories/<int:category_id>', methods=['DELETE'])
 @auth.login_required
 def delete_category(category_id):
-    category = get_category_by_id(category_id)
-    if not category:
+    result = remove_category(category_id)
+    if result == False:
         abort(404)
-    remove_category(category)
     return jsonify({'result': True})

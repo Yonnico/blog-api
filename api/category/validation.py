@@ -3,7 +3,7 @@ from api.core.validation import is_str, is_int
 
 
 def validate_title(val):
-    return is_str(val) and len(val)
+    return val != None and is_str(val) and len(val)
 
 
 def is_category_id_exist(id):
@@ -15,4 +15,4 @@ def is_category_id_exist(id):
 
 
 def validate_category(val):
-    return is_int(val) and is_category_id_exist(val)
+    return val != None and is_int(val) and is_category_id_exist(val)
