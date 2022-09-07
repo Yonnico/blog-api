@@ -4,6 +4,8 @@ from api.post.db import all_posts
 
 from api.category.validation import validate_category
 
+from api.category.services import add_category_to_post
+
 from api.post.validation import validate_author, validate_content, validate_title
 from api.post.validation import validate_s_d, validate_s_d_for_change
 
@@ -22,6 +24,10 @@ def make_full_post(post):
 
 def get_short_posts(posts):
     return list(map(make_short_post, posts))
+
+
+def get_posts_with_category(posts):
+    return list(map(add_category_to_post, posts))
 
 
 def get_post_by_id(post_id):

@@ -26,10 +26,6 @@ def get_all_categories():
     return all_categories
 
 
-def get_posts_with_category(posts):
-    return list(map(add_category_to_post, posts))
-
-
 def remove_category(category):
     return all_categories.remove(category)
 
