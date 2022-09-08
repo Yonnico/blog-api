@@ -63,7 +63,7 @@ def get_post(post_id):
 @auth.login_required
 def add_post():
     if not request.json:
-        abort(404)
+        abort(400)
     post = validate_and_add_post(
         request.json.get('author', None),
         request.json.get('title', None),
@@ -71,7 +71,7 @@ def add_post():
         request.json.get('content', None)
     )
     if not post:
-        abort(400)
+        abort(404)
     return jsonify(post)
 
 
@@ -79,7 +79,7 @@ def add_post():
 @auth.login_required
 def change_post(post_id):
     if not request.json:
-        abort(404)
+        abort(400)
     response = validate_and_change_post(
         post_id,
         request.json.get('category_id', None),
@@ -122,12 +122,12 @@ def get_category(category_id):
 @auth.login_required
 def add_category():
     if not request.json:
-        abort(404)
+        abort(400)
     category = validate_and_add_category(
         request.json.get('title', None)
     )
     if not category:
-        abort(400)
+        abort(404)
     return jsonify(category)
 
 
@@ -136,7 +136,7 @@ def add_category():
 @auth.login_required
 def change_category(category_id):
     if not request.json:
-        abort(404)
+        abort(400)
     response = validate_and_change_category(
         category_id,
         request.json.get('title', None)
