@@ -1,10 +1,10 @@
 from api.post.db import all_posts
-from api.category.services import get_all_categories
+from api.category.services import get_all_categories, get_category_by_id
 
 from api.category.validation import validate_category
 
-from api.post.validation import validate_author, validate_content, validate_title
-from api.post.validation import validate_description
+from api.post.validation import validate_author, validate_content
+from api.post.validation import validate_description, validate_title
 
 #FOR CONTROLLER
 def make_short_post(post):
@@ -20,8 +20,7 @@ def make_full_post(post):
 
 
 def get_post_with_category(post):
-    categories = get_all_categories()
-    category = list(filter(lambda c: c['id'] == post['category_id'], categories))
+    category = get_category_by_id(post['category_id'])
     category = category[0]
     post_with_category = post.copy()
     post_with_category.pop('category_id')
@@ -85,17 +84,34 @@ def get_post_by_id_with_category(post_id):
     return get_post_with_category(post)
 
 
+def get_posts_by_category_id(category):
+    posts = list(filter(lambda p: p['category_id'] == category, all_posts))
+    return posts
+
+
 def get_all_posts(isFull = False):
     value = all_posts
     if isFull:
         return list(map(make_full_post, value))
-    return list(map(make_short_post, value))
+    return value
 
 
 def remove_post(post_id):
     post = get_post_by_id(post_id)
     if post != None:
         return all_posts.remove(post)
+    return False
+
+
+def remove_category_with_link(category_id):
+    categories = get_all_categories()
+    category = get_category_by_id(category_id)
+    if category != None:
+        links = get_posts_by_category_id(category['id'])
+        if links != None:
+            for link in links:
+                link['category_id'] = None
+            return categories.remove(category)
     return False
 
 

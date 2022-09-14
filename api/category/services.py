@@ -1,7 +1,5 @@
 from api.category.db import all_categories
 
-from api.post.services import get_all_posts
-
 from api.category.validation import validate_title
 
 #FOR CONTROLLER
@@ -33,18 +31,6 @@ def get_category_by_id(category_id):
 
 def get_all_categories():
     return all_categories
-
-
-def remove_category(category_id):
-    category = get_category_by_id(category_id)
-    posts = get_all_posts()
-    if category != None:
-        link = list(filter(lambda p: p['category_id'] == category['id'], posts))
-        if link != None:
-            for post in link:
-                post.pop('category_id')
-            return all_categories.remove(category)
-    return False
 
 
 def validate_and_add_category(title):

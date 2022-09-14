@@ -5,11 +5,10 @@ from flask_httpauth import HTTPBasicAuth
 from api.post.services import get_posts_with_category, remove_post
 from api.post.services import get_post_by_id, validate_and_add_post
 from api.post.services import get_all_posts, validate_and_change_post
-from api.post.services import get_post_by_id_with_category
+from api.post.services import get_post_by_id_with_category, remove_category_with_link
 
 from api.category.services import validate_and_change_category, get_all_categories
-from api.category.services import validate_and_add_category
-from api.category.services import get_category_by_id, remove_category
+from api.category.services import validate_and_add_category, get_category_by_id
 
 
 app = Flask(__name__)
@@ -153,7 +152,7 @@ def change_category(category_id):
 @app.route('/blog/api/v1.0/categories/<int:category_id>', methods=['DELETE'])
 @auth.login_required
 def delete_category(category_id):
-    result = remove_category(category_id)
+    result = remove_category_with_link(category_id)
     if result == False:
         abort(404)
     return jsonify({'result': True})
