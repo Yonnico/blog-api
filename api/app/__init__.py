@@ -5,9 +5,10 @@ from flask_httpauth import HTTPBasicAuth
 from api.post.services import get_posts_with_category, remove_post
 from api.post.services import get_post_by_id, validate_and_add_post
 from api.post.services import get_all_posts, validate_and_change_post
+from api.post.services import get_post_by_id_with_category
 
 from api.category.services import validate_and_change_category, get_all_categories
-from api.category.services import add_category_to_post, validate_and_add_category
+from api.category.services import validate_and_add_category
 from api.category.services import get_category_by_id, remove_category
 
 
@@ -44,7 +45,7 @@ def get_posts():
     posts = get_all_posts()
     with_category = request.args.get('with-category')
     if with_category or with_category == '':
-        posts = get_posts_with_category(posts)
+        posts = get_posts_with_category()
     return jsonify({'all_posts': posts})
 
 
@@ -55,7 +56,7 @@ def get_post(post_id):
         abort(404)
     with_category = request.args.get('with-category')
     if with_category or with_category == '':
-        post = add_category_to_post(post)
+        post = get_post_by_id_with_category(post_id)
     return jsonify(post)
 
 
@@ -65,13 +66,14 @@ def add_post():
     if not request.json:
         abort(400)
     post = validate_and_add_post(
+        request.json.get('category_id', None),
         request.json.get('author', None),
         request.json.get('title', None),
         request.json.get('description', None),
         request.json.get('content', None)
     )
     if not post:
-        abort(404)
+        abort(400)
     return jsonify(post)
 
 
@@ -85,7 +87,7 @@ def change_post(post_id):
         request.json.get('category_id', None),
         request.json.get('author', None),
         request.json.get('title', None),
-        request.json.get('short_description', None),
+        request.json.get('description', None),
         request.json.get('content', None)
     )
     if response['status'] == 0:
@@ -127,7 +129,7 @@ def add_category():
         request.json.get('title', None)
     )
     if not category:
-        abort(404)
+        abort(400)
     return jsonify(category)
 
 

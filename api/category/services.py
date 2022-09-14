@@ -1,7 +1,8 @@
 from api.category.db import all_categories
-from api.post.db import all_posts
 
-from api.category.validation import  validate_title
+from api.post.services import get_all_posts
+
+from api.category.validation import validate_title
 
 
 def get_category_by_id(category_id):
@@ -11,28 +12,17 @@ def get_category_by_id(category_id):
     return None
 
 
-
-def add_category_to_post(post):
-    if 'category_id' in post:
-        category = list(filter(lambda c: c['id'] == post['category_id'], all_categories))
-        category = category[0]
-        post_with_category = post.copy()
-        post_with_category.pop('category_id')
-        post_with_category['category'] = category
-        return post_with_category
-    return post
-
-
 def get_all_categories():
     return all_categories
 
 
 def remove_category(category_id):
     category = get_category_by_id(category_id)
+    posts = get_all_posts()
     if category != None:
-        posts = list(filter(lambda p: p['category_id'] == category['id'], all_posts))
-        if posts != None:
-            for post in posts:
+        link = list(filter(lambda p: p['category_id'] == category['id'], posts))
+        if link != None:
+            for post in link:
                 post.pop('category_id')
             return all_categories.remove(category)
     return False
