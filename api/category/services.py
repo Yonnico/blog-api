@@ -4,6 +4,25 @@ from api.post.services import get_all_posts
 
 from api.category.validation import validate_title
 
+#FOR CONTROLLER
+
+def private_validate_category(title, required):
+    if required or 'title' != None:
+        if not validate_title(title):
+            return False
+    return True
+
+
+def private_add_category(title):
+    id = all_categories[-1]['id'] + 1
+    category = {
+        'id': id,
+        'title': title
+    }
+    all_categories.append(category)
+    return category
+
+#FOR VIEW
 
 def get_category_by_id(category_id):
     category = list(filter(lambda c: c['id'] == category_id, all_categories))
@@ -32,23 +51,6 @@ def validate_and_add_category(title):
     if not private_validate_category(title, True):
         return None
     return private_add_category(title)
-
-
-def private_validate_category(title, required):
-    if required or 'title' != None:
-        if not validate_title(title):
-            return False
-    return True
-
-
-def private_add_category(title):
-    id = all_categories[-1]['id'] + 1
-    category = {
-        'id': id,
-        'title': title
-    }
-    all_categories.append(category)
-    return category
 
 
 def validate_and_change_category(category_id, title):

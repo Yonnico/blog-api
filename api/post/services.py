@@ -6,7 +6,7 @@ from api.category.validation import validate_category
 from api.post.validation import validate_author, validate_content, validate_title
 from api.post.validation import validate_description
 
-
+#FOR CONTROLLER
 def make_short_post(post):
     short_post = post.copy()
     short_post.pop('content')
@@ -28,6 +28,41 @@ def get_post_with_category(post):
     post_with_category['category'] = category
     return post_with_category
 
+    
+def private_validate_post(category_id, author, title, description, content, required):
+    if category_id != None:
+        if not validate_category(category_id):
+            return False
+    if required or author != None:
+        if not validate_author(author):
+            return False
+    if required or title != None:
+        if not validate_title(title):
+            return False
+    if required or description != None:
+        if not validate_description(description):
+            return False
+    if required or content != None:
+        if not validate_content(content):
+            return False
+    return True
+
+
+def private_add_post(category_id, author, title, description, content):
+    id = all_posts[-1]['id'] + 1
+    post = {
+        'id': id,
+        'category_id': category_id,
+        'author': author,
+        'title': title,
+        'description': description,
+        'content': content
+    }
+    all_posts.append(post)
+    return post
+
+
+#FOR VIEW
 
 def get_posts_with_category(posts):
     posts = get_all_posts()
@@ -68,39 +103,6 @@ def validate_and_add_post(category_id, author, title, description, content):
     if not private_validate_post(category_id, author, title, description, content, True):
         return None
     return private_add_post(category_id, author, title, description, content)
-
-
-def private_validate_post(category_id, author, title, description, content, required):
-    if category_id != None:
-        if not validate_category(category_id):
-            return False
-    if required or author != None:
-        if not validate_author(author):
-            return False
-    if required or title != None:
-        if not validate_title(title):
-            return False
-    if required or description != None:
-        if not validate_description(description):
-            return False
-    if required or content != None:
-        if not validate_content(content):
-            return False
-    return True
-
-
-def private_add_post(category_id, author, title, description, content):
-    id = all_posts[-1]['id'] + 1
-    post = {
-        'id': id,
-        'category_id': category_id,
-        'author': author,
-        'title': title,
-        'description': description,
-        'content': content
-    }
-    all_posts.append(post)
-    return post
 
 
 def validate_and_change_post(post_id, category_id, author, title, description, content):
